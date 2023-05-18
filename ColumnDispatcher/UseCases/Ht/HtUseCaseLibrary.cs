@@ -12,7 +12,7 @@ public class HtUseCaseLibrary : IUseCaseLibrary
             }
             if (ColumnStatePrecedence.PrecedesOrEquals(train.TargetState, ColumnState.BeamOff))
             {
-                return train.ReplaceCurrentUseCase(new CacheHt(new TrainFacade(train, "CacheHt"), request.Data.Ht));
+                return train.ExecuteImmediately(new CacheHt(new TrainFacade(train, "CacheHt"), request.Data.Ht));
             }
             else
             {

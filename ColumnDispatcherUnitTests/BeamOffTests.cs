@@ -73,7 +73,7 @@ namespace ColumnDispatcherUnitTests
             _setup.ColumnDispatcher.Execute(r);
             _setup.Controller.CheckExpectedFlowIsExhausted();
         }
-        
+
         [TestMethod]
         public void GivenBeamOnExecuting_WhenBeamOffCalled_BeamOnAbortedAndBeamOffExecuted()
         {

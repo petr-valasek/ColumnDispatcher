@@ -11,6 +11,7 @@ public interface ITrain
 
     public ITrainUseCase JoinCurrentUseCase();
     public ITrainUseCase ReplaceCurrentUseCase(IUseCase newUseCase);
+    public ITrainUseCase ExecuteImmediately(IUseCase newUseCase);
     public ITrainUseCase AmendCurrentUseCase(IUseCase newUseCase);
     public ITrainUseCase PlaceNewUseCase(IUseCase newUseCase);
     public IEnumerable<IUseCase> GetRunningUseCases();

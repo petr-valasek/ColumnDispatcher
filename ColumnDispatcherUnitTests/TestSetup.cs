@@ -17,7 +17,8 @@ public class TestSetup
         {
             new BeamOnOffUseCaseLibrary(),
             new HtUseCaseLibrary(),
-            new BoosterSequenceLibrary()
+            new BoosterSequenceLibrary(),
+            new BeamCurrentUseCaseLibrary(),
         };
 
         ColumnDispatcher = new ColumnDispatcher.TrainModel.ColumnDispatcher(useCaseLibs, train);

@@ -45,6 +45,7 @@ public class WrapperUseCase: ITrainUseCase
             _parent.RemoveUseCase(this);
         });
     }
+
     public Task GetWaitableTask()
     {
         return _task;

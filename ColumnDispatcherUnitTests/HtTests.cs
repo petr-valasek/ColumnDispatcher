@@ -74,6 +74,40 @@ namespace ColumnDispatcherUnitTests
             _setup.Controller.CheckExpectedFlowIsExhausted();
         }
 
+        [TestMethod]
+        public void GivenBeamOffExecuting_WhenHtChange_HtCached()
+        {
+            _setup.SetUp(ColumnState.BeamOn);
+            var beamOffRequest = new Request { Target = ColumnState.BeamOff };
+            var htChangeRequest = new Request { };
+            htChangeRequest.Change.Add(ChangeTypeSingle.Ht);
+            htChangeRequest.Data = new ChangeData { Ht = 15000 };
+
+            _setup.Controller.SetExpectedFlow(
+                new Item(ColumnCommand.Blank, null, ColumnState.Blanked),
+                new Item(ColumnCommand.ParkL1, null, ColumnState.L1Parked),
+                new Item(ColumnCommand.SetApertureBlocking, null, ColumnState.ApertureMovingNoL1),
+                // here, the use case gets stuck, it will be prodded manually
+                // but first, it will expect a change ht request
+                new Item(ColumnCommand.ChangeHt, 15000d, ColumnState.ApertureMovingNoL1),
+                // then, let's finish the beam off sequence
+                new Item(ColumnCommand.BeamOff, null, ColumnState.BeamOff)
+            );
+            // Execute the beam off request on another thread
+            var beamOffTask = new Task(() =>
+            {
+                _setup.ColumnDispatcher.Execute(beamOffRequest);
+            });
+            beamOffTask.Start();
+            // wait for the Controller state change to TurningOff with timeout as TimeSpan
+            _setup.Controller.WaitForStateChange(ColumnState.ApertureMovingNoL1, TimeSpan.FromSeconds(5));
+            _setup.ColumnDispatcher.Execute(htChangeRequest);
+            _setup.Controller.State = ColumnState.BeamBlocked;
+            // wait for beam off task to finish
+            beamOffTask.Wait();
+            _setup.Controller.CheckExpectedFlowIsExhausted();
+        }
+
         private readonly TestSetup _setup = new();
 
     }

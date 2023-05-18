@@ -23,7 +23,7 @@ public class Train: ITrain
             throw new InvalidOperationException("No use case to join");
         }
 
-        Logger.Log($"Joining current use case {_useCases.First().Name}", $"");
+        Logger.Log("New Use Case", $"Joining current use case {_useCases.First().Name}");
         var joiner = new JoinerUseCase(_useCases.First(), this);
         _useCases.Add(joiner);
         return joiner;
@@ -34,12 +34,21 @@ public class Train: ITrain
         // TODO: parallelize
         foreach (var useCase in _useCases)
         {
+            Logger.Log(newUseCase.Name,$"Cancelling use case {useCase.Name}");
             useCase.GetCancellationTokenSource().Cancel();
         }
         var wrapper = new WrapperUseCase(newUseCase, this);
         _useCases = new() { wrapper };
         return wrapper;
     }
+
+    public ITrainUseCase ExecuteImmediately(IUseCase newUseCase)
+    {
+        var wrapper = new WrapperUseCase(newUseCase, this);
+        _useCases.Add(wrapper);
+        return wrapper;
+    }
+
 
     public ITrainUseCase PlaceNewUseCase(IUseCase newUseCase)
     {

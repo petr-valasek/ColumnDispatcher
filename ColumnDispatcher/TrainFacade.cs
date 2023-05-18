@@ -34,6 +34,12 @@ public class TrainFacade: ITrain
         return _impl.ReplaceCurrentUseCase(newUseCase);
     }
 
+    public ITrainUseCase ExecuteImmediately(IUseCase newUseCase)
+    {
+        Logger.Log(_name, $"Executing immediately UseCase {newUseCase.Name}");
+        return _impl.ExecuteImmediately(newUseCase);
+    }
+
     public ITrainUseCase AmendCurrentUseCase(IUseCase newUseCase)
     {
         Logger.Log(_name, $"Amending current UseCase with {newUseCase.Name}");

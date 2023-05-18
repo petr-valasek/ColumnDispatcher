@@ -38,6 +38,7 @@ public class StateMachineMock : IStateMachine
         Assert.AreEqual(first.ExpectedData,data);
         State = first.NextState;
         _flow = _flow.Skip(1).ToList();
+        Logger.Log($"ColumnControl", $"Flow has {_flow.Count} items left");
     }
 
 
@@ -55,13 +56,14 @@ public class StateMachineMock : IStateMachine
 
     public void CheckExpectedFlowIsExhausted()
     {
+        Logger.Log($"ColumnControl", $"Checking: Flow has {_flow.Count} items left");
         Assert.AreEqual(0, _flow.Count);
     }
 
     public ColumnState State
     {
         get => _state;
-        private set
+        set // private for IStateMachine users, public for unit tests
         {
             if (value != State)
             {
@@ -77,8 +79,19 @@ public class StateMachineMock : IStateMachine
     private ColumnState? pausedState = null;
     private TestContext _testContext;
 
-    public void PauseAt(ColumnState state)
+    public void WaitForStateChange(ColumnState desiredState, TimeSpan timeout)
     {
-        pausedState = state;
+        var stateReached = new AutoResetEvent(false);
+        StateChanged += (sender, state) =>
+        {
+            if (state == desiredState)
+            {
+                stateReached.Set();
+            }
+        };
+        if (!stateReached.WaitOne(timeout))
+        {
+            throw new TimeoutException($"State {desiredState} not reached in {timeout} seconds");
+        }
     }
 }
